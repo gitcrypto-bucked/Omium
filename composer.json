@@ -1,0 +1,19 @@
+{
+    "require": 
+    {
+        "monolog/monolog": "^3.9",
+        "altorouter/altorouter": "*"
+    },
+	"autoload": {
+		"psr-4": 
+        {
+			"Core\\": "Core/",
+			"App\\": "App/"	,
+            "Facades\\": "Facades/"
+        }
+	},
+    "config": 
+    {
+        
+    }
+}
