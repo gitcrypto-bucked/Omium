@@ -22,7 +22,7 @@ class Auth
         {
             if(empty($_SESSION['login']) || !isset($_SESSION['login']) && $_SERVER['REQUEST_URI'] !='/login')
             {
-               Redirect::to('logout'); ;
+               Redirect::to('login'); ;
             }
         }
     }
