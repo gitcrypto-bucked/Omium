@@ -1,5 +1,7 @@
 # Omium  
-_A cross-platform / open source / (brief description of what Omium is)_
+_A cross-platform / open source / PHP Mikro Framework
+
+-> Alpha 1  do not use in production
 
 ## Table of Contents  
 - [About](#about)  
@@ -17,13 +19,12 @@ _A cross-platform / open source / (brief description of what Omium is)_
 ## About  
 Omium is a (brief one-liner).  
 It aims to (what problem it solves).  
-Built with (technologies used: e.g., PHP, JavaScript, Node.js, Laravel, etc) and following (mention any patterns or principles).
+Built with (technologies used: e.g., PHP, JavaScript, SQL , etc) and following (mention any patterns or principles).
 
 ## Features  
-- Feature 1: (e.g., REST API interface for …)  
-- Feature 2: (e.g., Real-time data processing)  
-- Feature 3: (e.g., Micro-service architecture or IoT integration)  
-- Feature 4: (optional) (e.g., Multi-tenant, multi-language support)  
+
+- Feature 1: (e.g., Micro-service architecture or IoT integration)  
+- Feature 1: (optional) (e.g., Multi-tenant, multi-language support)  
 
 ## Getting Started  
 
@@ -105,7 +106,7 @@ License
 Distributed under the MIT License. See LICENSE for more information.
 
 Contact / Acknowledgements
-Your Name — your.email@example.com
+Your Name —pedrodeuss@aol.com
 Project Link: https://github.com/gitcrypto-bucked/Omium
 Acknowledgements:
 
