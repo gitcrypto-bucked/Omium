@@ -1,11 +1,57 @@
 <?php
 
 
+function css($file = null , $url = null)
+{
+    if(!is_null($file))
+    {
+         return '<link rel="stylesheet" href="'.asset($file).'">';
+    }
+    if(!is_null($url))
+    {
+         return '<link rel="stylesheet" href="'.($url).'">';
+    }
+
+}
+
+function Roboto()
+{
+    return css(null,'https://fonts.googleapis.com/css?family=Roboto');
+}
+
+function Raleway()
+{
+    return css(null,'https://fonts.googleapis.com/css?family=Raleway');
+}
+
+function fontAwesome($version)
+{
+    switch($version)
+    {
+        case '4.7':
+            return css(null,'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
+        break;
+        case '7.0': 
+        default:
+            return css(null,'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css');
+        break;
+    }
+}
+
+function boostrapIcons()
+{
+    return css(null,'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.13.1/font/bootstrap-icons.min.css');
+}
+
+function Jquery()
+{
+    return '<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
+}
+
 
 function asset($file)
 {
     $path = getcwd();
-    //return ($path.'/public/'.$file);
     return (base_url(true, false, false).'/public/'.$file);
 }   
 
@@ -15,7 +61,6 @@ function url($to)
     $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
     $uri = $_SERVER['REQUEST_URI'];
-
     $full_url = $protocol . '://' . $host . $uri;
     return base_url(true, false, false).$to;
 
@@ -48,19 +93,33 @@ if (!function_exists('base_url')) {
 
 function csrf()
 {
-    // $token = bin2hex(random_bytes(32));
-    // $_SESSION['csrf_token'] = $token;
-    // return $token;
     return \Facades\CSRF::generate();
 }
 
 function csrf_token()
 {
-    return csrf();
+    return '<input type="hidden" name="csrf_token" value="'.csrf().'">';
 }
 
-function csrf_field()
+function sayHello($name)
 {
-    return '<input type="hidden" name="csrf_token" value="'.csrf_token().'">';
+    $hora = date('H');
+    $saudacao = null;
+
+    if($hora <12 && $hora>=6) $saudacao = "Bom dia";
+
+    if($hora >=12 && $hora<18) $saudacao = "Boa tarde";
+
+    if($hora >=18 && $hora <=23) $saudacao = "Boa noite";
+    if($hora <6 && $hora>=0) $saudacao = "Boa madrugada";
+
+
+    echo $saudacao.", ".$name;
 }
+
+function template($file)
+{
+      include_once(dirname(__DIR__)."/Templates/views"."/".$file.'.blaze.php');
+}
+
 

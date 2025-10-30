@@ -8,28 +8,22 @@ class Auth
 {
     public static function beforeAction()
     {
-        //var_dump($_SERVER['REQUEST_URI']); exit;
-
         $requestMethod = $_SERVER['REQUEST_METHOD'];
         if($requestMethod == "POST")
         {
-            if(!isset($_REQUEST['csrf_token']))
+            
+            if(!isset($_REQUEST['csrf_token']) && \Facades\CSRF::validate()!=true)
             {
-                Redirect::to('login'); exit;
-            }
-            else if(\Facades\CSRF::validate($_REQUEST['csrf_token'])!=true)
-            {
-                \Facades\ExpiredPage::render(); exit;
+               \Facades\ExpiredPage::render(); exit;
             }
             return true;
         }
-        if($requestMethod == 'GET')
+         if($requestMethod == 'GET')
         {
-            if(!empty($_SESSION['login']) || !isset($_SESSION['login']))
+            if(empty($_SESSION['login']) || !isset($_SESSION['login']) && $_SERVER['REQUEST_URI'] !='/login')
             {
-                Redirect::to('afterlogin'); exit;
+               Redirect::to('logout'); ;
             }
-            else  Redirect::to('login'); exit;
         }
     }
 }

@@ -3,14 +3,23 @@
 
 namespace Core;
 use Core\Datatables;
+use \Facades\DB;
 
 class Model
 {
-    public static function start()
-    {
-       $dt = new Datatables();
-       $db = $dt->getConnection();
-    }
+     /**
+      * Retorna o nome da tabela
+      * @return string
+      */
+     public static function getTable()
+     {
+        return 'table';
+     }
+     public static function find($id)
+     {
+        return DB::getInstance()->table(self::getTable())->where('id', '=', $id)->get();
+     }
+
 }
 
 

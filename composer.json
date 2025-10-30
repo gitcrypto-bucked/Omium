@@ -2,14 +2,16 @@
     "require": 
     {
         "monolog/monolog": "^3.9",
-        "altorouter/altorouter": "*"
+        "altorouter/altorouter": "*",
+        "fakerphp/faker": "^1.24"
     },
 	"autoload": {
 		"psr-4": 
         {
 			"Core\\": "Core/",
 			"App\\": "App/"	,
-            "Facades\\": "Facades/"
+            "Facades\\": "Facades/",
+            "database\\":"database"
         }
 	},
     "config": 

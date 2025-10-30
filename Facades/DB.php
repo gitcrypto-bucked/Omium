@@ -4,14 +4,30 @@ declare(strict_types=1);
 
 namespace Facades;
 use Core\Datatables;
-
+use \Monolog\Logger;
+use \Monolog\Handler\StreamHandler;
+use Monolog\Formatter\JsonFormatter;
 
 class DB
 {
-    protected $table;
+    protected $table = null;
+    protected $sql = null;
     protected $select = ['*'];
     protected $where = [];
     protected $params = [];
+    protected $logger;
+    protected $order = [];
+
+    public function __construct()
+    {
+        $this->logger = new Logger("Connection Error");
+        $formatter = new JsonFormatter();
+
+        $stream_handler = new StreamHandler("php://stdout");
+        $stream_handler->setFormatter($formatter);
+
+        $this->logger->pushHandler($stream_handler);
+    }
 
     public function table(string $tableName): self
     {
@@ -34,26 +50,71 @@ class DB
 
     public function get()
     {
-        $sql = "SELECT " . implode(', ', $this->select) . " FROM " . $this->table;
+      
+        $this->sql = "SELECT " . implode(', ', $this->select) . " FROM " . $this->table;
 
-        if (!empty($this->where)) {
+        if (!empty($this->where)) 
+        {
             $whereClauses = [];
             foreach ($this->where as $condition) {
                 $whereClauses[] = "{$condition['column']} {$condition['operator']} :{$condition['column']}";
             }
-            $sql .= " WHERE " . implode(' AND ', $whereClauses);
+            $this->sql .= " WHERE " . implode(' AND ', $whereClauses);
         }
 
+        if(!empty($this->order))
+        {
+            $this->sql .= " ORDER BY {$this->order['column']} {$this->order['direction']}";
+        }
+        
         $conn = Datatables::getInstance()->getConnection();
-        $stmt = $conn->prepare($sql);
-        $stmt->execute($this->params);
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt = $conn->prepare($this->sql);
+
+        try
+        {
+            $stmt->execute($this->params);
+            $this->sql = null;
+            $this->whereClauses = [];
+        }
+        catch(\Exception $err)
+        {
+            $this->logger->error("DB failed: " . $err->getMessage());
+        }
+        $res =  $stmt->fetchAll(\PDO::FETCH_ASSOC);
+     
+        return   $res;
+    }
+
+    public function order(string $column, string $direction = 'ASC'): self
+    {
+        $this->order = ['column' => $column, 'direction' => $direction];
+        return $this;
     }
 
     public function insert(array $data)
     {
+        
         $SQL = "INSERT INTO {$this->table} (".implode(', ', array_keys($data)).") VALUES ( :".implode(', :',array_keys($data)).")";
         $conn = Datatables::getInstance()->getConnection();
+        return $conn->prepare($SQL)->execute($data);
+    }
+
+
+    public function update(array $data)
+    {
+        $conn = Datatables::getInstance()->getConnection();
+    
+        $SQL = "UPDATE {$this->table} SET ".implode(', ', array_map(function($key) { return "{$key}=:{$key}"; }, array_keys($data)));
+
+        if (!empty($this->where)) 
+        {
+            $whereClauses = [];
+            foreach ($this->where as $condition) {
+                $whereClauses[] = "{$condition['column']} {$condition['operator']} :{$condition['column']}";
+            }
+            $SQL .= " WHERE " . implode(' AND ', $whereClauses);
+        }
+        $data[$this->where[0]['column']] =  $this->where[0]['value'];
         return $conn->prepare($SQL)->execute($data);
     }
 
@@ -68,9 +129,8 @@ class DB
 
     public static function  getInstance()
     {
-        if(self::$instance === null){
-            self::$instance = new self;
-        }
+         self::$instance  = null;
+        self::$instance = new DB();;
         return self::$instance;
     }
 

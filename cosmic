@@ -1,0 +1,366 @@
+<?php
+require __DIR__.'/vendor/autoload.php';
+use Facades\Config;
+use database\Seeders;
+use database\factories\UserFactory;
+use database\migrations\UserMigration;
+//include_once __DIR__."/database/factories/UserFactory.php";
+
+Config::env();
+ob_start();
+factories();
+migrations();
+
+global $todo;
+
+
+echo "Hello I'm cosmic.";
+echo PHP_EOL;
+echo PHP_EOL;
+
+echo "  *   *   *";echo PHP_EOL;
+
+$saudations= ['Hi', "Hello", "Howdy", "What’s up?","How’s it going", "Good Morning", "Good Night", "Good Afternun"];
+$saudations = array_map('strtolower', $saudations);
+$response;
+
+
+
+if(sizeof($argv)>0)
+{
+    if(!empty($argv[1]))
+    {
+        $response = array_search($argv[1], $saudations);
+        if($response !== false)
+        {
+            echo $saudations[$response];
+        }
+    }
+
+    if( isset($argv[1]) &&  str_contains($argv[1], ':')!=false)
+    {
+        $todo = (explode(':',  $argv[1] )); 
+    }
+    switch($todo)
+    {
+        case array('create','database'):
+             if(!isset($argv[2]))
+            {
+                echo "Sorry I can't understand.".PHP_EOL;echo PHP_EOL;
+                echo "For the verb create plase select what. \n Example create:database @databaseName or create:table @tableName";echo PHP_EOL;echo PHP_EOL;
+                exit;
+            }
+            else
+            {
+                echo "Please wait I'm creating a database called ".$argv[2]."."; echo PHP_EOL;
+                createDatabase(true, $argv[2]);
+            }
+        break;
+        case array('create','table'):
+             if(!isset($argv[2]))
+            {
+                echo "Sorry I can't understand.".PHP_EOL;echo PHP_EOL;
+                echo "For the verb create plase select what. \n Example create:database @databaseName or create:table @tableName";echo PHP_EOL;echo PHP_EOL;
+                exit;
+            }
+            else
+            {
+                echo "Please wait I'm creating a database called ".$argv[2]."."; echo PHP_EOL;
+                createTable( $argv[2]);
+            }
+        break;
+        case array('make','init'):
+             $ht ="RewriteEngine On
+                RewriteCond %{REQUEST_FILENAME} !-f
+                RewriteCond %{REQUEST_FILENAME} !-d
+                RewriteRule . index.php [L]";
+
+            if(!file_exists('.htaccess'))
+            {
+                $myfile = fopen(".htaccess", "w+");
+                fwrite($myfile, $ht);
+                fclose($myfile);
+                echo "File .htaccess created ".PHP_EOL;
+            }
+            else
+            {
+                echo "File .htaccess exists,  ".PHP_EOL;
+            }
+
+        break;
+        case array('make','controller'):
+             if(!isset($argv[2]))
+            {
+                echo "Sorry I can't understand.".PHP_EOL;echo PHP_EOL;
+                echo "For the verb create plase select what. \n Example create:controller @controllerName";echo PHP_EOL;echo PHP_EOL;
+                exit;
+            }
+            else
+            {
+                echo "Please wait I'm creating a controller called ".$argv[2]."."; echo PHP_EOL;
+                createController( $argv[2]);
+            }
+        break;
+        case array('make','model'):
+             if(!isset($argv[2]))
+            {
+                echo "Sorry I can't understand.".PHP_EOL;echo PHP_EOL;
+                echo "For the verb create plase select what. \n Example create:model @modelName";echo PHP_EOL;echo PHP_EOL;
+                exit;
+            }
+            else
+            {
+                echo "Please wait I'm creating a model called ".$argv[2]."."; echo PHP_EOL;
+                createModel( $argv[2]);
+            }
+        break;
+        case array('optimize','clear'):
+            echo 'Pleasy wait, I am optimizing the cache.';
+            $conn = getConnection(true);
+            $SQL = "DELETE FROM sessions";
+            $conn->prepare($SQL)->execute();
+            unset($conn);
+            try
+            {
+                //Clear cache and check filesize again
+                clearstatcache();
+                #opcache_reset();
+                ob_get_clean();
+                ob_end_clean();
+            }
+            catch(\Exception $e)
+            {
+
+            }
+            echo PHP_EOL;
+            echo 'Cache optimized.';
+        break;
+        case array('user','seed'):
+            echo PHP_EOL;
+            if (confirmAction("Do you want to proceed? (y/n): ")) 
+            {
+                echo "User chose to proceed.\n";
+                echo PHP_EOL;
+                UserFactory::up();
+            } 
+            else 
+            {
+                echo "User chose not to proceed.\n"; exit;
+            }
+        break;
+        case array('user', 'migrate'):
+            echo PHP_EOL;
+            if (confirmAction("Do you want to proceed? (y/n): ")) 
+            {
+                echo "User chose to proceed.\n";
+                echo PHP_EOL;
+                UserMigration::up();
+                echo PHP_EOL;
+            } 
+            else 
+            {
+                echo "User chose not to proceed.\n"; exit;
+            }
+        break;
+        case array('seed',''):
+             echo PHP_EOL;
+            if (confirmAction("Do you want to proceed? (y/n): ")) 
+            {
+                echo "\n";
+                echo "User chose to proceed.\n";
+                echo PHP_EOL;
+                Seeders::run();
+                echo PHP_EOL;
+            } 
+            else 
+            {
+                echo "User chose not to proceed.\n"; exit;
+            }
+           
+        break;
+        default:
+            if( isset($argv[1]) &&  $argv[1]=='serve')
+            {
+                echo 'Please wait, I am starting the server.';
+                shell_exec('php -S localhost:8000');
+                echo 'Server started.';
+                return;
+            }
+            echo "Sorry I can't understand.".PHP_EOL;echo PHP_EOL;
+            echo "For the verb create plase select what. \n Example create:database @databaseName or create:table @tableName";echo PHP_EOL;echo PHP_EOL;
+            exit;
+    }    
+}
+
+function confirmAction(string $message = "Are you sure? (y/n): "): bool
+{
+    while (true) {
+        $response = strtolower(readline($message)); // Read input and convert to lowercase
+
+        if (in_array($response, ['y', 'yes'])) {
+            return true;
+        } elseif (in_array($response, ['n', 'no'])) {
+            return false;
+        } else {
+            echo "Invalid input. Please enter 'y' or 'n'.\n";
+        }
+    }
+}
+
+
+function createDatabase($flag = false, $database )
+{
+    global $username;
+    global $password;
+    global $dsn;
+
+    
+    
+    try
+    {
+        $db = getConnection(true);
+        // make a database connection
+        $db = new PDO($dsn, $username, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+
+        if ($db) 
+        {
+            $SQL ="CREATE SCHEMA {$database}";
+            print_r($SQL).PHP_EOL; 
+            if($db->exec($SQL))
+            {
+                echo "Database {$database}  create suscessfull";
+            }
+        }
+    }
+    catch (PDOException $e) 
+    {
+        die($e->getMessage());
+    }
+    finally
+    {
+        $db =null;
+        unset($db);
+    }
+}
+
+function createTable($tablename)
+{
+    $db = getConnection(true);
+    $SQL ="CREATE TABLE {$tablename} (id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY)";
+    print_r($SQL).PHP_EOL; 
+    if($db->exec($SQL))
+    {
+        echo "Table {$tablename}  create suscessfull";
+    }
+    else
+    {
+        echo "Table {$tablename}  create failed";
+    }
+}
+
+function getConnection($flag = true)
+{
+    global $db;
+    switch(getenv('DB_CONNECTION'))
+    {
+        case 'mysql':
+            if($flag)
+            {
+                $dsn = 'mysql:host='.trim(getenv('DB_HOST')).';dbname='.trim(getenv('DB_DATABASE'));
+                $username = trim(getenv('DB_USERNAME'));
+                $password = trim(getenv('DB_PASSWORD'));
+
+                $db = new \PDO($dsn, $username, $password);
+                $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                if($db->connect_error)
+                {
+                    die("Connection failed: " . $db->connect_error);
+                }
+                echo "Connected successfully".PHP_EOL;
+            }
+            break;
+        case 'pgsql':
+            if($flag)
+            {
+                $db = new \PDO("pgsql:host=".getenv('DB_HOST').";dbname=".getenv('DB_DATABASE'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+                if($db->connect_error)
+                {
+                    die("Connection failed: " . $db->connect_error);
+                }
+                echo "Connected successfully".PHP_EOL;
+            }
+            break;
+        case 'sqlite':
+            if($flag)
+            {
+                $db = new \PDO("sqlite:".getenv('DB_DATABASE'));
+                if($db->connect_error)
+                {
+                    die("Connection failed: " . $db->connect_error);
+                }
+                echo "Connected successfully".PHP_EOL;
+            }
+            break;
+        case 'sqlsrv':
+            if($flag)
+            {
+                $db = new \PDO("sqlsrv:Server=".getenv('DB_HOST').";Database=".getenv('DB_DATABASE'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+                if($db->connect_error)
+                {
+                    die("Connection failed: " . $db->connect_error);
+                }
+                echo "Connected successfully".PHP_EOL;
+            }
+            break;
+    }
+    return $db;
+}
+
+function createController($name)
+{
+    $controller = "<?php \n\nnamespace App\Controllers;\n\nclass {$name} \n{\n    public function indexAction()\n    {\n        echo 'Hello World!';\n    }\n}\n\n?>";
+
+    file_put_contents("App/Controllers/{$name}.php", $controller);  
+    echo "Controller {$name} created successfully.";
+}
+
+function createModel($name)
+{
+    $model = "<?php \n\nnamespace App\Models;\n\nclass {$name} \n{\n    public function indexAction()\n    {\n        echo 'Hello World!';\n    }\n}\n\n?>";
+    file_put_contents("App/Models/{$name}.php", $model);
+ 
+    echo "Model {$name} created successfully.";
+}
+
+function factories()
+{
+    $directory = __DIR__."/database/factories";
+    if (is_dir($directory))
+    {
+        $files = scandir($directory);
+        $files = array_diff($files, array('.', '..'));
+        foreach ($files as $file) 
+        {
+            #echo $file."\n";
+           return include_once __DIR__."/database/factories/{$file}";
+        }
+    }
+}
+
+function migrations()
+{
+    $directory = __DIR__."/database/migrations";
+    if (is_dir($directory))
+    {
+        $files = scandir($directory);
+        $files = array_diff($files, array('.', '..'));
+        foreach ($files as $file) 
+        {
+           echo include_once __DIR__."/database/migrations/{$file}";
+           return include_once __DIR__."/database/migrations/{$file}";
+        }
+    }
+}
+
+global $db;
+?>

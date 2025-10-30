@@ -9,7 +9,7 @@ class Hash
 {
     public static function make(string $raw_password)
     {
-        return (password_hash($senha, PASSWORD_DEFAULT));
+        return (password_hash($raw_password, PASSWORD_DEFAULT));
     }
 
 
