@@ -1,6 +1,7 @@
 <?php
 
 namespace Core;
+use Facades\Config;
 
 class Validate
 {
@@ -37,7 +38,7 @@ class Validate
 	{
 		if (!in_array(strtolower($_SERVER['REQUEST_METHOD']), ['get', 'post', 'put', 'delete']))
         {
-			if (Config::DEBUG)
+			if (getenv('DEBUG'))
 				throw new \Exception("{$_SERVER['REQUEST_METHOD']} METHOD NOT ALLOWED", 405);
 			else
 				header('HTTP/1.0 405 Method Not Allowed');

@@ -1,0 +1,30 @@
+# Ignorar a pasta de dependências do Composer
+# Arquivo de ambiente principal. NUNCA deve ser enviado ao repositório.
+.env
+
+
+
+# Dependências de back-end e front-end
+/vendor/
+
+# Arquivos de log e cache
+*.log
+/storage/*.log
+/storage/app/public/
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/framework/views/
+/storage/logs/
+/bootstrap/cache/
+
+# Arquivos de ambiente e de configuração local
+.env
+.env.backup
+.env.dusk.*.local
+.vscode/
+.idea/
+.fleet/
+.ddev/
+.trae/
+
+

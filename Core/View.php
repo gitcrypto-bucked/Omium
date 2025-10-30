@@ -4,8 +4,8 @@
 namespace Core;
 
 include_once('Facades/View.php');
-
-
+use \Core\Auth;
+use \Facades\Route;
 
 class View
 {
@@ -17,7 +17,8 @@ class View
     
     public static function renderTemplate(string $template, array $args = [], $message): void
     {
-        if(file_exists(dirname(__DIR__)."/App/Views"."/".$template.'.blaze.php')==true)
+        
+        if(file_exists(dirname(__DIR__)."/Templates/views"."/".$template.'.blaze.php')==true)
         {
             if($message!='' | $message !=null)
             {
@@ -25,11 +26,10 @@ class View
             }
             if(!empty($args))
             {
-                //var_dump($args); exit;
                 extract($args);
             }
             
-            include_once(dirname(__DIR__)."/App/Views"."/".$template.'.blaze.php');exit;
+            include_once(dirname(__DIR__)."/Templates/views"."/".$template.'.blaze.php');exit;
         }
 		
     }

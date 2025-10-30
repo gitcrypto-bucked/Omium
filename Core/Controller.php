@@ -2,6 +2,7 @@
 
 
 namespace Core;
+include_once('Facades/View.php');
 
 
 abstract class Controller

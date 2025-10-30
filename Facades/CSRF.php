@@ -7,6 +7,9 @@ class CSRF
 {
     public static function generate()
     {
+         unset($_SESSION['csrf_token']);
+         unset($_SESSION['csrf_token_time']);
+
          $token = bin2hex(random_bytes(32));
          $timestamp = strtotime(date('H:i:s')) + 60*60;
          $time = date('H:i:s', $timestamp);
@@ -15,8 +18,20 @@ class CSRF
          return $token;
     }
 
-    public static function validate($token)
+    public static function validate()
     {
-        return isset($_SESSION['csrf_token']) && strtotime($_SESSION['csrf_token_time']) >= strtotime(date('H:i')) && $_SESSION['csrf_token'] == $token;
+        if(isset($_SESSION['csrf_token']))
+        {
+            $bool =  strtotime($_SESSION['csrf_token_time']) <= strtotime(date('H:i'));
+            if($bool==false)
+            {
+                \Facades\ExpiredPage::render(); exit;
+            }
+        }
+        else 
+        {
+            return false;
+        }
+        #return isset($_SESSION['csrf_token']) && strtotime($_SESSION['csrf_token_time']) <= strtotime(date('H:i')) && $_SESSION['csrf_token'] == $token;
     }
 }

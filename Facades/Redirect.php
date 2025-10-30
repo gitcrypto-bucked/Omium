@@ -8,12 +8,16 @@ class Redirect
 
     public static function to($url)
     {
-        header('Location: '.static::url($url));
+        header('Location: '.static::url($url)); exit;
     }
 
     public static function back()
     {
-        header('Location: '. $_SERVER['HTTP_REFERER']);
+        // if($_SESSION['back'] != null)
+        // {
+        //     return header('Location: '. $_SESSION['back']);
+        // }
+         echo "<script>history.back();</script>"; exit;
     }
 
     public static function with($key, $value)
