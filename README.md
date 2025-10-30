@@ -30,8 +30,7 @@ Built with (technologies used: e.g., PHP, JavaScript, SQL , etc) and following (
 
 ### Prerequisites  
 Before you begin, make sure you have (software/SDK versions):  
-- PHP ≥ X.X  
-- Node.js ≥ X.X (if applicable)  
+- PHP ≥ 8.2  
 - MySQL / PostgreSQL / other database  
 - Docker (optional)  
 - …  
@@ -46,7 +45,7 @@ Install dependencies
 bash
 Copiar código
 composer install   # if using PHP  
-npm install        # if frontend/Node.js  
+php cosmic serve
 Setup environment
 
 bash
