@@ -16,10 +16,7 @@ class Admin
 
     public function usersAction($request)
     {
-        if(boolval(Auth::user()['admin'])!=true)
-        {
-            return Redirect::back();
-        }
+        Auth::admin();
         $fn = $request['fn'];
         $id = base64_decode($request['id']);
         
@@ -59,10 +56,7 @@ class Admin
 
     public function updateUsersAction($request)
     {
-        if(boolval(Auth::user()['admin'])!=true)
-        {
-            return Redirect::back();
-        }
+        Auth::admin();
 
         $validation = [
             'id' => 'required',
