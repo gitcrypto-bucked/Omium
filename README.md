@@ -1,7 +1,7 @@
 # Omium  
 _A cross-platform / open source / PHP Mikro Framework
 
--> Alpha 1  do not use in production
+-> Alpha 1.2  do not use in production
 
 ## Table of Contents  
 - [About](#about)  
@@ -24,7 +24,8 @@ Built with (technologies used: e.g., PHP, JavaScript, SQL , etc) and following (
 ## Features  
 
 - Feature 1: (e.g., Micro-service architecture or IoT integration)  
-- Feature 1: (optional) (e.g., Multi-tenant, multi-language support)  
+- Feature 1: (optional) (e.g., Multi-tenant, multi-language support)
+- Feature 2: RestFull API Support
 
 ## Getting Started  
 
