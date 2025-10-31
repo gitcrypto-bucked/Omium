@@ -123,3 +123,35 @@ function template($file)
 }
 
 
+function paginate($links)
+{
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $uri = $_SERVER['REQUEST_URI'];
+    $full_url = $protocol . '://' . $host . $uri;
+       $path = strtok($full_url, '?');
+       $full_url = $path;
+
+    if(isset($links['pages']) && $links['pages']!=1)
+    {
+
+
+        $html= '  <div class="max-w-3xl mx-auto py-12 px-4 mt-3">
+                    <div class="flex justify-center items-center space-x-2">
+                       ';
+
+        // <a class="px-3 py-2 bg-gray-800 text-gray-300 rounded hover:bg-gray-700" href="'.$full_url.'?page=1'.'">Anterior</a>
+        for($i =0; $i< $links['pages']; $i++)
+        {
+            $html.=' <a class="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500" href="'.$full_url.'?page='.($i+1).'">'.($i+1).'</a>';
+        }
+
+        //<a href="'.$full_url.'?page='.$links['pages'].'"  class="px-3 py-2 bg-gray-800 text-gray-300 rounded hover:bg-gray-700">Fim</a>
+        $html.=' 
+            </div>
+        </div>';
+
+  
+        print_r($html);
+    }
+}

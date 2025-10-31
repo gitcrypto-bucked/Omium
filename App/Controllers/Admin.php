@@ -6,12 +6,11 @@ use \Facades\Redirect;
 
 class Admin 
 {
-    public function indexAction()
+    public function indexAction($request)
     {
         Auth::admin();
-        $users = \App\Models\User::all();
-
-         \Core\View::renderTemplate('users', ['users'=>$users],null);
+        $users = \App\Models\User::allPaginated(8, @$request['page']);
+        \Core\View::renderTemplate('users', ['users'=>$users],null);
     }
 
     public function usersAction($request)
@@ -30,7 +29,7 @@ class Admin
                     if(!isset($_GET['status']))
                     {
                          \Core\View::renderTemplate('templates/prompt', ['yes'=>\Facades\Redirect::url('/users/delete/'.$request['id'].'?status=yes'),
-                                                                    'no'=>\Facades\Redirect::url('/admin'),
+                                                                    'no'=>\Facades\Redirect::url('admin'),
                                                                     'text'=>'Esta ação não pode ser desfeita. Por favor, confirme para prosseguir.'
                                                                 ],null);
                     }
@@ -56,8 +55,7 @@ class Admin
 
     public function updateUsersAction($request)
     {
-        Auth::admin();
-
+       Auth::admin();
         $validation = [
             'id' => 'required',
             'name' => 'required',
@@ -70,7 +68,13 @@ class Admin
         {
             $id = $request['id'];
             $admin =  str_contains($request['nivel'],'admin')? '1' : '0';
-            $ativo =  strpos($request['ativo'],'ativo')? '1' : '0';
+            #$ativo =  strpos($request['ativo'],'ativo')? '1' : '0';
+
+            $ativo = '0';
+            if($request['ativo']=='ativo')
+            {
+                $ativo = '1';
+            }
 
              $data = [
                 'name' => $request['name'],

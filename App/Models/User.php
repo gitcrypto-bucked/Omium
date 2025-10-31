@@ -26,10 +26,16 @@ class User  extends \Core\Model
         return DB::getInstance()->table(self::getTable())->order('id', 'ASC')->get();
     }
 
+    public static function allPaginated($limit, $page =0)
+    {
+         return DB::getInstance()->table(self::getTable())->order('id', 'ASC')->paginate($limit, $page);
+    }
+
     public static function delete($id)
     {
         return DB::getInstance()->table(self::getTable())->delete('id', '=', $id);
     }
+
 
      /**
      * Retorna o nome da tabela

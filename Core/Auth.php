@@ -6,7 +6,8 @@ use \Facades\Routing;
 use App\Models\User as UserModel;
 use \Facades\DB;
 use \Facades\Redirect;
-
+use \Facades\Guard;
+use Core\Sanctum;
 
 class Auth
 {
@@ -55,7 +56,6 @@ class Auth
 		   return false;
 		}
 	}
-
 
 	/**
 	 * Verifica se usuário está logado
@@ -141,7 +141,7 @@ class Auth
 	{
 		if (isset($_SESSION['login']))
 		{
-			$user = DB::getInstance()->table('users')->where('name', '=', $_SESSION['login']['user'])->get();
+			$user = DB::getInstance()->select(['id','name','email','admin','password','avatar'])->table('users')->where('name', '=', $_SESSION['login']['user'])->get();
 			if ($user[0] !=false && !empty($user[0])) 
 			{
 				return $user[0];
@@ -178,4 +178,40 @@ class Auth
 			return \Facades\Unauthorized::handle();
 		}
 	}
+
+
+	public static function guard($guard)
+	{
+		$browsers = ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+					 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 OPR/122.0.0.0'];
+		switch($guard)
+		{
+			case 'web': 
+					if(!empty($_SERVER['HTTP_USER_AGENT']))
+					{
+						$in = in_array($_SERVER['HTTP_USER_AGENT'], $browsers);							
+						if($in)
+						{
+							return Guard::PreventApiTroughtWeb();
+						}
+					}
+			break;
+		}
+	}
+
+	public static function via($via)
+	{
+		switch($via)
+		{
+			case 'sanctum':
+				$user = static::user();
+				#return Sanctum::createToken($user);
+				return Sanctum::getInstance();
+			break;
+		}
+	}
+
+
+
+
 }

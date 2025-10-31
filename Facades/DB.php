@@ -85,6 +85,70 @@ class DB
         return   $res;
     }
 
+    public function paginate(int $limit, $page = 0 )
+    {
+        $conn = Datatables::getInstance()->getConnection();
+        $this->sql = "SELECT " . implode(', ', $this->select) . " FROM " . $this->table;
+        $stmt = $conn->prepare($this->sql);
+        $stmt->execute($this->params);
+        $reg = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        unset($stmt);
+
+        if(!empty($reg))
+        {
+             $pages = intval(intval(sizeof($reg)) / intval($limit));
+        }
+        else
+        {
+            $pages = 1;
+        }
+
+        if (!empty($this->where)) 
+        {
+            $whereClauses = [];
+            foreach ($this->where as $condition) {
+                $whereClauses[] = "{$condition['column']} {$condition['operator']} :{$condition['column']}";
+            }
+            $this->sql .= " WHERE " . implode(' AND ', $whereClauses);
+        }
+
+        if(!empty($this->order))
+        {
+            $this->sql .= " ORDER BY {$this->order['column']} {$this->order['direction']}";
+        }
+
+        if(is_null($page) || intval($page) ==1 || intval($page) == 0)
+        {
+              $this->sql.= " LIMIT 0, {$limit} ";
+        }
+        else
+        {
+            //$offset = ($currentPage - 1) * $itemsPerPage;
+            $till = ($page -1) * $limit;
+            $this->sql.= " LIMIT {$till}, {$limit} ";
+        }
+        
+        
+        $stmt = $conn->prepare($this->sql);
+
+        try
+        {
+            $stmt->execute($this->params);
+            $this->sql = null;
+            $this->whereClauses = [];
+        }
+        catch(\Exception $err)
+        {
+            $this->logger->error("DB failed: " . $err->getMessage());
+        }
+        $res =  $stmt->fetchAll(\PDO::FETCH_ASSOC);
+     
+        return  ['items'=>$res, 'pages'=>$pages];
+    }
+
+
+
+
     public function order(string $column, string $direction = 'ASC'): self
     {
         $this->order = ['column' => $column, 'direction' => $direction];
@@ -93,7 +157,6 @@ class DB
 
     public function insert(array $data)
     {
-        
         $SQL = "INSERT INTO {$this->table} (".implode(', ', array_keys($data)).") VALUES ( :".implode(', :',array_keys($data)).")";
         $conn = Datatables::getInstance()->getConnection();
         return $conn->prepare($SQL)->execute($data);
