@@ -72,7 +72,7 @@ Provide example usage snippets:
 bash
 Copiar código
 # call an API endpoint  
-curl -X GET "http://localhost:8000/api/v1/items" -H "Authorization: Bearer <token>"  
+curl -X GET "http://localhost:8000/api/$endpoint" -H "Authorization: Bearer <token>"  
 Show a screenshot or brief sample of functionality if needed.
 
 Architecture / How it works
