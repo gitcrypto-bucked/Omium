@@ -181,8 +181,9 @@ if(sizeof($argv)>0)
         default:
             if( isset($argv[1]) &&  $argv[1]=='serve')
             {
+                $port = strlen(getenv('APP_PORT')) ? getenv('APP_PORT') : 8080;
                 echo 'Please wait, I am starting the server.';
-                shell_exec('php -S localhost:8000');
+                shell_exec('php -S localhost:'.$port);
                 echo 'Server started.';
                 return;
             }
